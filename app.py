@@ -761,7 +761,7 @@ with tab3:
         labels     = ["Runs/game", "v-max", "HSR dist", "Intensity", "Peak speed"]
 
         fig_radar = go.Figure()
-        colors    = ["#f0a500", "#1a4b8c", "#1a6b3c", "#c0392b", "#888888"]
+        colors    = [POS_COLORS.get(p, "#888888") for p in ["GK","DEF","MID","FWD","UNK"]]
 
         for i, row in pos_agg.iterrows():
             vals = []
@@ -1017,7 +1017,7 @@ with tab5:
                     y="n_runs",
                     color="pos",
                     barmode="stack",
-                    color_discrete_sequence=px.colors.qualitative.Set2,
+                    color_discrete_map=POS_COLORS,
                     labels={
                         "pitch_zone": "Pitch zone",
                         "n_runs": "HSR runs",
@@ -1055,7 +1055,7 @@ with tab5:
         y_edges = [-34.0,  -11.33, 11.33, 34.0]   # 3 channels
 
         x_labels = ["Defensive third", "Middle third", "Attacking third"]
-        y_labels = ["Left channel", "Central channel", "Right channel"]
+        y_labels = ["Right channel", "Central channel", "Left channel"]
 
         # Count runs in each zone
         import numpy as np
