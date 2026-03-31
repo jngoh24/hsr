@@ -495,7 +495,8 @@ with tab1:
     col_chart, col_scatter = st.columns([3, 2])
 
     with col_chart:
-        top_n = st.select_slider("Show top N players", options=[10, 15, 20, 25, 30], value=20)
+        top_n = st.select_slider("Show top players", options=[10, 15, 20, 25, 30], value=20,
+                                  format_func=lambda x: f"Top {x}")
         top_players = filtered_summary.nlargest(top_n, "runs_per_game_dynamic")
 
         fig_bar = go.Figure()
