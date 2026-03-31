@@ -159,15 +159,16 @@ with st.sidebar:
         unsafe_allow_html=True
     )
 
-    threshold_pct = st.slider(
+    threshold_int = st.slider(
         label="Relative threshold",
-        min_value=0.60,
-        max_value=0.95,
-        value=0.75,
-        step=0.05,
-        format="%.0f%%",
+        min_value=60,
+        max_value=95,
+        value=75,
+        step=5,
+        format="%d%%",
         help="75% = industry-comparable. Raise to see only near-maximum efforts."
     )
+    threshold_pct = threshold_int / 100.0
 
     st.markdown(f"""
     <div style="background:#111827;border:1px solid #1e2a45;border-radius:8px;padding:12px;margin-top:8px;">
@@ -248,24 +249,76 @@ if not data_loaded:
 # ─────────────────────────────────────────────
 # Recompute metric at selected threshold
 # ─────────────────────────────────────────────
-# Re-derive runs_per_game and threshold at selected pct
-# We have vmax_kmh in summary — recompute threshold and flag qualifying players
-summary_df["threshold_at_pct"] = summary_df["vmax_kmh"] * threshold_pct
-summary_df["qualifies_relative"] = (
-    summary_df["vmax_kmh"] * threshold_pct
-) <= summary_df["tournament_peak_speed_kmh"]
+# Recompute runs_per_game dynamically from runs_df using pct_of_vmax
+# runs_df has one row per run with pct_of_vmax — filter to runs that
+# qualify at the current threshold and recount per player per game
+
+qualifying_runs = runs_df[runs_df["pct_of_vmax"] >= threshold_pct].copy()
+
+dynamic_counts = (
+    qualifying_runs
+    .groupby("player_id")
+    .agg(
+        total_runs_dynamic   = ("run_id", "count"),
+        games_with_runs      = ("game_id", "nunique"),
+        mean_pct_dynamic     = ("pct_of_vmax", "mean"),
+        mean_duration_dynamic= ("duration_sec", "mean"),
+        total_distance_dynamic=("distance_m", "sum"),
+        mean_peak_dynamic    = ("peak_speed_kmh", "mean"),
+    )
+    .reset_index()
+)
+dynamic_counts["runs_per_game_dynamic"] = (
+    dynamic_counts["total_runs_dynamic"]
+    / dynamic_counts["games_with_runs"].clip(lower=1)
+).round(2)
+dynamic_counts["mean_pct_dynamic"] = (
+    dynamic_counts["mean_pct_dynamic"] * 100
+).round(1)
+
+# Merge dynamic counts back onto summary
+summary_merged = summary_df.merge(dynamic_counts, on="player_id", how="left")
+summary_merged["total_runs_dynamic"]    = summary_merged["total_runs_dynamic"].fillna(0).astype(int)
+summary_merged["runs_per_game_dynamic"] = summary_merged["runs_per_game_dynamic"].fillna(0)
+summary_merged["threshold_at_pct"]     = summary_merged["vmax_kmh"] * threshold_pct
 
 # Recompute comparison metrics at new threshold
-comparison_df["threshold_at_pct"] = comparison_df["vmax_kmh"] * threshold_pct
-comparison_df["above_absolute"]   = comparison_df["threshold_kmh"] <= 20.0
-comparison_df["new_threshold_vs_20"] = comparison_df["threshold_at_pct"] - 20.0
+comparison_df["threshold_at_pct"]   = comparison_df["vmax_kmh"] * threshold_pct
+comparison_df["above_absolute"]     = comparison_df["threshold_at_pct"] <= 20.0
+comparison_df["new_threshold_vs_20"]= comparison_df["threshold_at_pct"] - 20.0
+
+# Dynamic comparison: recount absolute and relative runs at new threshold
+abs_counts = (
+    runs_df[runs_df["peak_speed_kmh"] >= 20.0]
+    .groupby("player_id")
+    .size()
+    .reset_index(name="runs_absolute_dynamic")
+)
+rel_counts = (
+    qualifying_runs
+    .groupby("player_id")
+    .size()
+    .reset_index(name="runs_relative_dynamic")
+)
+comparison_df = comparison_df.merge(abs_counts, on="player_id", how="left")
+comparison_df = comparison_df.merge(rel_counts, on="player_id", how="left")
+comparison_df["runs_absolute_dynamic"] = comparison_df["runs_absolute_dynamic"].fillna(0).astype(int)
+comparison_df["runs_relative_dynamic"] = comparison_df["runs_relative_dynamic"].fillna(0).astype(int)
+comparison_df["run_delta"]   = comparison_df["runs_relative_dynamic"] - comparison_df["runs_absolute_dynamic"]
+comparison_df["pct_change"]  = (
+    (comparison_df["runs_relative_dynamic"] - comparison_df["runs_absolute_dynamic"])
+    / comparison_df["runs_absolute_dynamic"].clip(lower=1) * 100
+).round(1)
+comparison_df["category"] = comparison_df["run_delta"].apply(
+    lambda x: "gained" if x > 0 else ("lost" if x < 0 else "unchanged")
+)
 
 # Apply sidebar filters
-filtered_summary = summary_df[
-    summary_df["team_short"].isin(selected_teams) &
-    summary_df["position"].isin(selected_positions) &
-    (summary_df["games_appeared"] >= min_games) &
-    (~summary_df["low_confidence"])
+filtered_summary = summary_merged[
+    summary_merged["team_short"].isin(selected_teams) &
+    summary_merged["position"].isin(selected_positions) &
+    (summary_merged["games_appeared"] >= min_games) &
+    (~summary_merged["low_confidence"])
 ].copy()
 
 filtered_comparison = comparison_df[
@@ -281,7 +334,7 @@ k1, k2, k3, k4, k5 = st.columns(5)
 n_below_20 = (comparison_df["threshold_at_pct"] < 20.0).sum()
 pct_below  = n_below_20 / len(comparison_df) * 100
 avg_vmax   = filtered_summary["vmax_kmh"].mean()
-avg_runs   = filtered_summary["runs_per_game"].mean()
+avg_runs   = filtered_summary["runs_per_game_dynamic"].mean()
 top_speed  = filtered_summary["tournament_peak_speed_kmh"].max()
 n_players  = len(filtered_summary)
 
@@ -347,11 +400,11 @@ with tab1:
 
     with col_chart:
         top_n = st.select_slider("Show top N players", options=[10, 15, 20, 25, 30], value=20)
-        top_players = filtered_summary.nlargest(top_n, "runs_per_game")
+        top_players = filtered_summary.nlargest(top_n, "runs_per_game_dynamic")
 
         fig_bar = go.Figure()
         fig_bar.add_trace(go.Bar(
-            x=top_players["runs_per_game"],
+            x=top_players["runs_per_game_dynamic"],
             y=top_players["player_name"] + " (" + top_players["team_short"] + ")",
             orientation="h",
             marker=dict(
@@ -383,13 +436,13 @@ with tab1:
         fig_scatter = px.scatter(
             filtered_summary,
             x="vmax_kmh",
-            y="runs_per_game",
+            y="runs_per_game_dynamic",
             color="position",
             size="games_appeared",
             hover_data=["player_name", "team_name", "tournament_peak_speed_kmh"],
             labels={
                 "vmax_kmh": "Personal v-max (km/h)",
-                "runs_per_game": "HSR runs per game",
+                "runs_per_game_dynamic": "HSR runs per game",
                 "position": "Position",
             },
             color_discrete_sequence=px.colors.qualitative.Set2,
@@ -409,7 +462,7 @@ with tab1:
     st.markdown("#### Full player table")
     display_cols = [
         "player_name", "team_name", "position", "games_appeared",
-        "vmax_kmh", "threshold_kmh", "total_runs", "runs_per_game",
+        "vmax_kmh", "threshold_kmh", "total_runs_dynamic", "runs_per_game_dynamic",
         "hsr_distance_per_game_m", "mean_pct_of_vmax_pct",
         "tournament_peak_speed_kmh",
     ]
@@ -421,7 +474,7 @@ with tab1:
             "player_name": "Player", "team_name": "Team",
             "position": "Pos", "games_appeared": "Games",
             "vmax_kmh": "v-max", "threshold_kmh": "Threshold",
-            "total_runs": "Total runs", "runs_per_game": "Runs/game",
+            "total_runs_dynamic": "Total runs", "runs_per_game_dynamic": "Runs/game",
             "hsr_distance_per_game_m": "HSR dist/game (m)",
             "mean_pct_of_vmax_pct": "Avg % v-max",
             "tournament_peak_speed_kmh": "Peak speed",
@@ -440,8 +493,8 @@ with tab2:
         filtered_summary
         .groupby(["team_name", "team_short"])
         .agg(
-            avg_runs_per_game       = ("runs_per_game", "mean"),
-            total_team_runs         = ("total_runs", "sum"),
+            avg_runs_per_game       = ("runs_per_game_dynamic", "mean"),
+            total_team_runs         = ("total_runs_dynamic", "sum"),
             avg_vmax                = ("vmax_kmh", "mean"),
             avg_peak_speed          = ("tournament_peak_speed_kmh", "mean"),
             avg_hsr_distance        = ("hsr_distance_per_game_m", "mean"),
@@ -529,7 +582,7 @@ with tab3:
         filtered_summary
         .groupby("position")
         .agg(
-            avg_runs_per_game   = ("runs_per_game", "mean"),
+            avg_runs_per_game   = ("runs_per_game_dynamic", "mean"),
             avg_vmax            = ("vmax_kmh", "mean"),
             avg_threshold       = ("threshold_kmh", "mean"),
             avg_distance        = ("hsr_distance_per_game_m", "mean"),
@@ -679,7 +732,7 @@ with tab4:
             hover_data=["player_name", "team_name", "run_delta"],
             labels={
                 "vmax_kmh": "Personal v-max (km/h)",
-                "threshold_kmh": f"Threshold at {threshold_pct*100:.0f}% (km/h)",
+                "threshold_at_pct": f"Threshold at {threshold_pct*100:.0f}% (km/h)",
             },
         )
         fig_thresh.add_hline(y=20, line=dict(color=AMBER, width=1, dash="dot"),
@@ -742,8 +795,8 @@ with tab4:
     most_affected = (
         filtered_comparison
         .reindex(columns=["player_name", "team_short", "position",
-                          "vmax_kmh", "threshold_kmh",
-                          "runs_absolute", "runs_relative",
+                          "vmax_kmh", "threshold_at_pct",
+                          "runs_absolute_dynamic", "runs_relative_dynamic",
                           "run_delta", "pct_change", "category"])
         .sort_values("run_delta", key=abs, ascending=False)
         .head(30)
