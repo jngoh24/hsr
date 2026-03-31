@@ -195,11 +195,11 @@ with st.sidebar:
             placeholder="All teams"
         )
 
-        positions = sorted(summary_df["position"].dropna().unique().tolist())
+        pos_groups = ["GK", "DEF", "MID", "FWD", "UNK"]
         selected_positions = st.multiselect(
-            "Positions",
-            options=positions,
-            default=positions,
+            "Position group",
+            options=pos_groups,
+            default=["GK", "DEF", "MID", "FWD"],
             placeholder="All positions"
         )
 
@@ -245,6 +245,40 @@ if not data_loaded:
         "`hsr_comparison.csv`, and `hsr_runs.csv` in the `data/` folder."
     )
     st.stop()
+
+# ─────────────────────────────────────────────
+# Position rollup
+# ─────────────────────────────────────────────
+POS_ROLLUP = {
+    # Goalkeeper
+    "GK":  "GK",
+    # Defenders
+    "CB":  "DEF", "LCB": "DEF", "RCB": "DEF",
+    "LB":  "DEF", "RB":  "DEF",
+    "LWB": "DEF", "RWB": "DEF", "SW":  "DEF",
+    # Midfielders
+    "CDM": "MID", "CM":  "MID", "LCM": "MID", "RCM": "MID",
+    "CAM": "MID", "LAM": "MID", "RAM": "MID",
+    "LM":  "MID", "RM":  "MID",
+    # Forwards
+    "LW":  "FWD", "RW":  "FWD",
+    "LF":  "FWD", "RF":  "FWD",
+    "CF":  "FWD", "SS":  "FWD", "ST": "FWD",
+    # Unknown
+    "UNK": "UNK",
+}
+
+def add_pos_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Add pos (rolled-up group) and pos_detail (original code) columns."""
+    df = df.copy()
+    df["pos_detail"] = df["position"]
+    df["pos"] = df["position"].map(POS_ROLLUP).fillna("UNK")
+    return df
+
+summary_df   = add_pos_columns(summary_df)
+comparison_df= add_pos_columns(comparison_df)
+if "position" in runs_df.columns:
+    runs_df = add_pos_columns(runs_df)
 
 # ─────────────────────────────────────────────
 # Recompute metric at selected threshold
@@ -317,14 +351,14 @@ comparison_df["category"] = comparison_df["run_delta"].apply(
 # Apply sidebar filters
 filtered_summary = summary_merged[
     summary_merged["team_short"].isin(selected_teams) &
-    summary_merged["position"].isin(selected_positions) &
+    summary_merged["pos"].isin(selected_positions) &
     (summary_merged["games_appeared"] >= min_games) &
     (~summary_merged["low_confidence"])
 ].copy()
 
 filtered_comparison = comparison_df[
     comparison_df["team_short"].isin(selected_teams) &
-    comparison_df["position"].isin(selected_positions)
+    comparison_df["pos"].isin(selected_positions)
 ].copy()
 
 # ─────────────────────────────────────────────
@@ -438,13 +472,13 @@ with tab1:
             filtered_summary,
             x="vmax_kmh",
             y="runs_per_game_dynamic",
-            color="position",
+            color="pos",
             size="games_appeared",
-            hover_data=["player_name", "team_name", "tournament_peak_speed_kmh"],
+            hover_data=["player_name", "team_name", "pos_detail", "tournament_peak_speed_kmh"],
             labels={
                 "vmax_kmh": "Personal v-max (km/h)",
                 "runs_per_game_dynamic": "HSR runs per game",
-                "position": "Position",
+                "pos": "Position group",
             },
             color_discrete_sequence=px.colors.qualitative.Set2,
         )
@@ -464,7 +498,7 @@ with tab1:
 
     # Build display table — add avg speed, cap pct_of_vmax at 100%
     display_cols = [
-        "player_name", "team_name", "position", "games_appeared",
+        "player_name", "team_name", "pos", "pos_detail", "games_appeared",
         "vmax_kmh", "threshold_at_pct", "total_runs_dynamic", "runs_per_game_dynamic",
         "hsr_distance_per_game_m", "mean_peak_dynamic", "mean_pct_of_vmax_pct",
         "tournament_peak_speed_kmh",
@@ -489,7 +523,8 @@ with tab1:
         .rename(columns={
             "player_name":              "Player",
             "team_name":                "Team",
-            "position":                 "Pos",
+            "pos":                      "Pos",
+            "pos_detail":               "Pos detail",
             "games_appeared":           "Games",
             "vmax_kmh":                 "v-max (km/h)",
             "threshold_at_pct":         "Threshold (km/h)",
@@ -601,7 +636,7 @@ with tab3:
 
     pos_agg = (
         filtered_summary
-        .groupby("position")
+        .groupby("pos")
         .agg(
             avg_runs_per_game   = ("runs_per_game_dynamic", "mean"),
             avg_vmax            = ("vmax_kmh", "mean"),
@@ -613,7 +648,9 @@ with tab3:
         )
         .reset_index()
         .sort_values("avg_runs_per_game", ascending=False)
+        .reset_index()
     )
+    pos_agg = pos_agg.rename(columns={"pos": "position"})
 
     col_p1, col_p2 = st.columns(2)
 
@@ -626,7 +663,7 @@ with tab3:
             color_continuous_scale=[[0, "#1e3a5f"], [0.5, "#2196f3"], [1, "#4fc3f7"]],
             text=pos_agg["avg_runs_per_game"].round(1),
             labels={
-                "position": "Position",
+                "pos": "Position group",
                 "avg_runs_per_game": "Avg HSR runs per game",
                 "avg_intensity": "Avg intensity",
             },
@@ -661,7 +698,7 @@ with tab3:
             fig_radar.add_trace(go.Scatterpolar(
                 r=vals,
                 theta=labels + [labels[0]],
-                name=row["position"],
+                name=row.get("position", row.name),
                 line=dict(color=colors[i % len(colors)], width=2),
                 fill="toself",
                 fillcolor=colors[i % len(colors)],
@@ -685,7 +722,7 @@ with tab3:
     st.markdown("#### Position summary table")
     st.dataframe(
         pos_agg.rename(columns={
-            "position": "Position",
+            "position": "Pos group",
             "avg_runs_per_game": "Avg runs/game",
             "avg_vmax": "Avg v-max",
             "avg_threshold": "Avg threshold (km/h)",
@@ -815,7 +852,7 @@ with tab4:
     st.markdown("#### Most affected players")
     most_affected = (
         filtered_comparison
-        .reindex(columns=["player_name", "team_short", "position",
+        .reindex(columns=["player_name", "team_short", "pos", "pos_detail",
                           "vmax_kmh", "threshold_at_pct",
                           "runs_absolute_dynamic", "runs_relative_dynamic",
                           "run_delta", "pct_change", "category"])
@@ -894,7 +931,7 @@ with tab5:
             if "position" in runs_df.columns:
                 zone_pos = (
                     runs_df
-                    .groupby(["pitch_zone", "position"], observed=True)
+                    .groupby(["pitch_zone", "pos"], observed=True)
                     .size()
                     .reset_index(name="n_runs")
                 )
@@ -902,13 +939,13 @@ with tab5:
                     zone_pos,
                     x="pitch_zone",
                     y="n_runs",
-                    color="position",
+                    color="pos",
                     barmode="stack",
                     color_discrete_sequence=px.colors.qualitative.Set2,
                     labels={
                         "pitch_zone": "Pitch zone",
                         "n_runs": "HSR runs",
-                        "position": "Position",
+                        "pos": "Position group",
                     },
                 )
                 fig_zone_pos.update_layout(
