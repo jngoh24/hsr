@@ -462,18 +462,18 @@ with tab1:
     st.markdown("#### Full player table")
     display_cols = [
         "player_name", "team_name", "position", "games_appeared",
-        "vmax_kmh", "threshold_kmh", "total_runs_dynamic", "runs_per_game_dynamic",
+        "vmax_kmh", "threshold_at_pct", "total_runs_dynamic", "runs_per_game_dynamic",
         "hsr_distance_per_game_m", "mean_pct_of_vmax_pct",
         "tournament_peak_speed_kmh",
     ]
     st.dataframe(
         filtered_summary[display_cols]
-        .sort_values("runs_per_game", ascending=False)
+        .sort_values("runs_per_game_dynamic", ascending=False)
         .reset_index(drop=True)
         .rename(columns={
             "player_name": "Player", "team_name": "Team",
             "position": "Pos", "games_appeared": "Games",
-            "vmax_kmh": "v-max", "threshold_kmh": "Threshold",
+            "vmax_kmh": "v-max", "threshold_at_pct": "Threshold",
             "total_runs_dynamic": "Total runs", "runs_per_game_dynamic": "Runs/game",
             "hsr_distance_per_game_m": "HSR dist/game (m)",
             "mean_pct_of_vmax_pct": "Avg % v-max",
