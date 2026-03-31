@@ -280,6 +280,7 @@ dynamic_counts["mean_pct_dynamic"] = (
 summary_merged = summary_df.merge(dynamic_counts, on="player_id", how="left")
 summary_merged["total_runs_dynamic"]    = summary_merged["total_runs_dynamic"].fillna(0).astype(int)
 summary_merged["runs_per_game_dynamic"] = summary_merged["runs_per_game_dynamic"].fillna(0)
+summary_merged["mean_peak_dynamic"]     = summary_merged["mean_peak_dynamic"].fillna(0)
 summary_merged["threshold_at_pct"]     = summary_merged["vmax_kmh"] * threshold_pct
 
 # Recompute comparison metrics at new threshold
@@ -460,27 +461,47 @@ with tab1:
 
     st.divider()
     st.markdown("#### Full player table")
+
+    # Build display table — add avg speed, cap pct_of_vmax at 100%
     display_cols = [
         "player_name", "team_name", "position", "games_appeared",
         "vmax_kmh", "threshold_at_pct", "total_runs_dynamic", "runs_per_game_dynamic",
-        "hsr_distance_per_game_m", "mean_pct_of_vmax_pct",
+        "hsr_distance_per_game_m", "mean_peak_dynamic", "mean_pct_of_vmax_pct",
         "tournament_peak_speed_kmh",
     ]
+    table_df = filtered_summary[display_cols].copy()
+
+    # Cap avg % of v-max at 100 — values above 100 occur when peak speed
+    # in a run slightly exceeds the p99.5 v-max estimate (expected, not an error)
+    table_df["mean_pct_of_vmax_pct"] = table_df["mean_pct_of_vmax_pct"].clip(upper=100.0)
+
+    # Round numeric columns
+    table_df["vmax_kmh"]           = table_df["vmax_kmh"].round(1)
+    table_df["threshold_at_pct"]   = table_df["threshold_at_pct"].round(1)
+    table_df["hsr_distance_per_game_m"] = table_df["hsr_distance_per_game_m"].round(0)
+    table_df["mean_peak_dynamic"]  = table_df["mean_peak_dynamic"].round(1)
+    table_df["tournament_peak_speed_kmh"] = table_df["tournament_peak_speed_kmh"].round(1)
+
     st.dataframe(
-        filtered_summary[display_cols]
+        table_df
         .sort_values("runs_per_game_dynamic", ascending=False)
         .reset_index(drop=True)
         .rename(columns={
-            "player_name": "Player", "team_name": "Team",
-            "position": "Pos", "games_appeared": "Games",
-            "vmax_kmh": "v-max", "threshold_at_pct": "Threshold",
-            "total_runs_dynamic": "Total runs", "runs_per_game_dynamic": "Runs/game",
-            "hsr_distance_per_game_m": "HSR dist/game (m)",
-            "mean_pct_of_vmax_pct": "Avg % v-max",
-            "tournament_peak_speed_kmh": "Peak speed",
+            "player_name":              "Player",
+            "team_name":                "Team",
+            "position":                 "Pos",
+            "games_appeared":           "Games",
+            "vmax_kmh":                 "v-max (km/h)",
+            "threshold_at_pct":         "Threshold (km/h)",
+            "total_runs_dynamic":       "Total runs",
+            "runs_per_game_dynamic":    "Runs / game",
+            "hsr_distance_per_game_m":  "HSR dist / game (m)",
+            "mean_peak_dynamic":        "Avg speed in run (km/h)",
+            "mean_pct_of_vmax_pct":     "Avg % of v-max",
+            "tournament_peak_speed_kmh":"Peak speed (km/h)",
         }),
         use_container_width=True,
-        height=350,
+        height=400,
     )
 
 # ══════════════════════════════════════════════
