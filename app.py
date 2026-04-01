@@ -651,6 +651,244 @@ with tab1:
         height=400,
     )
 
+
+    # ══ Per-player zone heatmap ══════════════════════════════════════════
+    st.markdown("#### Player zone heatmap")
+    st.markdown(
+        '<p style="font-family:Inter;font-size:12px;color:#666;">'
+        'Select a player to see where their high-speed runs start across 30 pitch zones '
+        '(6 columns x 5 rows). Darker zones = more runs.</p>',
+        unsafe_allow_html=True
+    )
+
+    if "start_x" in runs_df.columns and "player_name" in qualifying_runs.columns:
+
+        player_options = (
+            filtered_summary
+            .sort_values("runs_per_game_dynamic", ascending=False)
+            .dropna(subset=["player_name"])
+            ["player_name"].tolist()
+        )
+
+        ph_col1, ph_col2 = st.columns([1, 2])
+
+        with ph_col1:
+            selected_player = st.selectbox(
+                "Select player",
+                options=player_options,
+                key="player_heatmap_selector"
+            )
+
+            pmeta = filtered_summary[filtered_summary["player_name"] == selected_player]
+            if not pmeta.empty:
+                pm = pmeta.iloc[0]
+                st.markdown(
+                    f'<div style="background:#f0f0ee;border-left:3px solid #111;'
+                    f'padding:10px 14px;margin-top:8px;">'
+                    f'<p style="font-family:Inter;font-size:11px;font-weight:600;color:#888;'
+                    f'text-transform:uppercase;letter-spacing:0.06em;margin:0 0 4px 0;">'
+                    f'{pm.get("team_name","")}</p>'
+                    f'<p style="font-family:Georgia,serif;font-size:20px;font-weight:600;'
+                    f'color:#111;margin:0 0 8px 0;">{selected_player}</p>'
+                    f'<p style="font-family:Inter;font-size:12px;color:#444;margin:0;">'
+                    f'{pm.get("pos_detail","")} &nbsp;&middot;&nbsp; '
+                    f'v-max <strong>{pm.get("vmax_kmh",0):.1f} km/h</strong></p>'
+                    f'<p style="font-family:Inter;font-size:12px;color:#444;margin:4px 0 0 0;">'
+                    f'<strong>{int(pm.get("total_runs_dynamic",0))}</strong> HSR runs &nbsp;&middot;&nbsp; '
+                    f'<strong>{pm.get("runs_per_game_dynamic",0):.1f}</strong> per game</p>'
+                    f'</div>',
+                    unsafe_allow_html=True
+                )
+
+        with ph_col2:
+            player_runs = qualifying_runs[
+                qualifying_runs["player_name"] == selected_player
+            ].copy()
+
+            if player_runs.empty:
+                st.info("No qualifying runs found for this player at the current threshold.")
+            else:
+                # 30-zone grid: 6 cols x 5 rows
+                x_edges_30 = [-52.5, -35.0, -17.5,  0.0, 17.5, 35.0, 52.5]
+                y_edges_30 = [-34.0, -20.4,  -6.8,  6.8, 20.4, 34.0]
+
+                # Channel labels — one word each to avoid multi-line string issues
+                ch_labels_30 = ["Right", "R. Half", "Centre", "L. Half", "Left"]
+
+                zone_counts_30 = np.zeros((5, 6), dtype=int)
+                zone_speed_30  = np.zeros((5, 6))
+
+                for _, row in player_runs.iterrows():
+                    xi = min(int(np.searchsorted(x_edges_30[1:], row["start_x"])), 5)
+                    yi = min(int(np.searchsorted(y_edges_30[1:], row["start_y"])), 4)
+                    zone_counts_30[yi, xi] += 1
+                    if "peak_speed_kmh" in player_runs.columns:
+                        zone_speed_30[yi, xi] += row["peak_speed_kmh"]
+
+                total_pr   = zone_counts_30.sum()
+                zone_pct_30 = np.where(total_pr > 0, zone_counts_30 / total_pr * 100, 0)
+                max_c = zone_counts_30.max() if zone_counts_30.max() > 0 else 1
+
+                PITCH_BG_P = "#f8f8f5"
+                PITCH_LN_P = "#c8c8c4"
+                PL_TOP     = "#aaaaaa"
+
+                fig_ph = go.Figure()
+
+                # Pitch background
+                fig_ph.add_shape(
+                    type="rect", x0=-52.5, x1=52.5, y0=-34, y1=34,
+                    fillcolor=PITCH_BG_P,
+                    line=dict(color=PITCH_LN_P, width=1.5),
+                    layer="below"
+                )
+
+                # Zone rectangles
+                for row_i in range(5):
+                    for col_i in range(6):
+                        x0 = x_edges_30[col_i]
+                        x1 = x_edges_30[col_i + 1]
+                        y0 = y_edges_30[row_i]
+                        y1 = y_edges_30[row_i + 1]
+                        count = int(zone_counts_30[row_i, col_i])
+                        pct   = float(zone_pct_30[row_i, col_i])
+                        inten = count / max_c
+
+                        r_c = int(255 + (26  - 255) * inten)
+                        g_c = int(255 + (75  - 255) * inten)
+                        b_c = int(255 + (140 - 255) * inten)
+                        fill = "rgba(%d,%d,%d,0.80)" % (r_c, g_c, b_c)
+                        tcol = "#ffffff" if inten > 0.45 else "#222222"
+                        cx   = (x0 + x1) / 2
+                        cy   = (y0 + y1) / 2
+
+                        fig_ph.add_shape(
+                            type="rect", x0=x0, x1=x1, y0=y0, y1=y1,
+                            fillcolor=fill,
+                            line=dict(color=PITCH_LN_P, width=0.5),
+                            layer="below"
+                        )
+
+                        if count > 0:
+                            fig_ph.add_annotation(
+                                x=cx, y=cy + 2.5,
+                                text="<b>%d</b>" % count,
+                                showarrow=False,
+                                font=dict(family="Inter", size=12, color=tcol),
+                                xanchor="center", yanchor="middle",
+                            )
+                            fig_ph.add_annotation(
+                                x=cx, y=cy - 2.8,
+                                text="%.0f%%" % pct,
+                                showarrow=False,
+                                font=dict(family="Inter", size=9, color=tcol),
+                                xanchor="center", yanchor="middle",
+                            )
+
+                # Pitch markings
+                for sh in [
+                    dict(type="line", x0=0, x1=0, y0=-34, y1=34,
+                         line=dict(color=PL_TOP, width=1.2)),
+                    dict(type="circle", x0=-9.15, x1=9.15, y0=-9.15, y1=9.15,
+                         line=dict(color=PL_TOP, width=1)),
+                    dict(type="rect", x0=-52.5, x1=-36, y0=-20.16, y1=20.16,
+                         line=dict(color=PL_TOP, width=1)),
+                    dict(type="rect", x0=36, x1=52.5, y0=-20.16, y1=20.16,
+                         line=dict(color=PL_TOP, width=1)),
+                    dict(type="rect", x0=-52.5, x1=52.5, y0=-34, y1=34,
+                         line=dict(color=PL_TOP, width=1.5)),
+                ]:
+                    fig_ph.add_shape(**sh)
+
+                # Zone grid lines
+                for xb in x_edges_30[1:-1]:
+                    fig_ph.add_shape(
+                        type="line", x0=xb, x1=xb, y0=-34, y1=34,
+                        line=dict(color=PL_TOP, width=0.6, dash="dot")
+                    )
+                for yb in y_edges_30[1:-1]:
+                    fig_ph.add_shape(
+                        type="line", x0=-52.5, x1=52.5, y0=yb, y1=yb,
+                        line=dict(color=PL_TOP, width=0.6, dash="dot")
+                    )
+
+                # Third labels above
+                third_labels = ["Defensive third", "Middle third", "Attacking third"]
+                third_cx     = [-35.0, 0.0, 35.0]
+                for lbl, cx in zip(third_labels, third_cx):
+                    fig_ph.add_annotation(
+                        x=cx, y=36.2, text=lbl.upper(),
+                        showarrow=False,
+                        font=dict(family="Inter", size=9, color="#888"),
+                        xanchor="center"
+                    )
+
+                # Channel labels left
+                for i, lbl in enumerate(ch_labels_30):
+                    cy = (y_edges_30[i] + y_edges_30[i + 1]) / 2
+                    fig_ph.add_annotation(
+                        x=-55, y=cy, text=lbl,
+                        showarrow=False,
+                        font=dict(family="Inter", size=9, color="#888"),
+                        xanchor="right"
+                    )
+
+                # Attack direction arrow
+                fig_ph.add_annotation(
+                    x=50, y=-37, ax=38, ay=-37,
+                    xref="x", yref="y", axref="x", ayref="y",
+                    showarrow=True, arrowhead=2, arrowsize=1,
+                    arrowwidth=1.5, arrowcolor="#888",
+                    text="Attack",
+                    font=dict(family="Inter", size=9, color="#888"),
+                    xanchor="right",
+                )
+
+                fig_ph.update_layout(
+                    plot_bgcolor=PITCH_BG_P,
+                    paper_bgcolor=PAPER_BG,
+                    height=460,
+                    margin=dict(l=70, r=16, t=30, b=20),
+                    xaxis=dict(range=[-58, 55], showgrid=False, zeroline=False,
+                               showticklabels=False, showline=False),
+                    yaxis=dict(range=[-40, 39], showgrid=False, zeroline=False,
+                               showticklabels=False, showline=False,
+                               scaleanchor="x", scaleratio=1),
+                    showlegend=False,
+                )
+
+                st.plotly_chart(fig_ph, use_container_width=True)
+
+                # Top zone narrative
+                ch_name   = {0: "right channel", 1: "right half-space",
+                             2: "central channel", 3: "left half-space",
+                             4: "left channel"}
+                third_name = {0: "defensive third", 1: "defensive third",
+                              2: "middle third",    3: "middle third",
+                              4: "attacking third", 5: "attacking third"}
+
+                flat_idx  = zone_counts_30.flatten().argsort()[::-1]
+                top_zones = [(int(idx // 6), int(idx % 6)) for idx in flat_idx
+                             if zone_counts_30[idx // 6, idx % 6] > 0][:3]
+
+                if top_zones:
+                    parts = []
+                    for ri, ci in top_zones:
+                        cnt = int(zone_counts_30[ri, ci])
+                        pct = float(zone_pct_30[ri, ci])
+                        parts.append(
+                            "<strong>%d runs (%.0f%%)</strong> in the %s of the %s"
+                            % (cnt, pct, ch_name.get(ri, ""), third_name.get(ci, ""))
+                        )
+                    st.markdown(
+                        '<p style="font-family:Inter;font-size:12px;color:#444;'
+                        'line-height:1.8;margin-top:4px;">'
+                        + " &nbsp;&middot;&nbsp; ".join(parts) + "</p>",
+                        unsafe_allow_html=True
+                    )
+    else:
+        st.info("Player zone heatmap requires start_x/start_y columns in hsr_runs.csv.")
+
 # ══════════════════════════════════════════════
 # TAB 2 — Team analysis
 # ══════════════════════════════════════════════
