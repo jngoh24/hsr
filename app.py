@@ -605,51 +605,6 @@ with tab1:
         )
         st.plotly_chart(fig_scatter, use_container_width=True)
 
-    st.divider()
-    st.markdown("#### Full player table")
-
-    # Build display table — add avg speed, cap pct_of_vmax at 100%
-    display_cols = [
-        "player_name", "team_name", "pos", "pos_detail", "games_appeared",
-        "vmax_kmh", "threshold_at_pct", "total_runs_dynamic", "runs_per_game_dynamic",
-        "hsr_distance_per_game_m", "mean_peak_dynamic", "mean_pct_of_vmax_pct",
-        "tournament_peak_speed_kmh",
-    ]
-    table_df = filtered_summary[display_cols].copy()
-
-    # Cap avg % of v-max at 100 — values above 100 occur when peak speed
-    # in a run slightly exceeds the p99.5 v-max estimate (expected, not an error)
-    table_df["mean_pct_of_vmax_pct"] = table_df["mean_pct_of_vmax_pct"].clip(upper=100.0)
-
-    # Round numeric columns
-    table_df["vmax_kmh"]           = table_df["vmax_kmh"].round(1)
-    table_df["threshold_at_pct"]   = table_df["threshold_at_pct"].round(1)
-    table_df["hsr_distance_per_game_m"] = table_df["hsr_distance_per_game_m"].round(0)
-    table_df["mean_peak_dynamic"]  = table_df["mean_peak_dynamic"].round(1)
-    table_df["tournament_peak_speed_kmh"] = table_df["tournament_peak_speed_kmh"].round(1)
-
-    st.dataframe(
-        table_df
-        .sort_values("runs_per_game_dynamic", ascending=False)
-        .reset_index(drop=True)
-        .rename(columns={
-            "player_name":              "Player",
-            "team_name":                "Team",
-            "pos":                      "Pos",
-            "pos_detail":               "Pos detail",
-            "games_appeared":           "Games",
-            "vmax_kmh":                 "v-max (km/h)",
-            "threshold_at_pct":         "Threshold (km/h)",
-            "total_runs_dynamic":       "Total runs",
-            "runs_per_game_dynamic":    "Runs / game",
-            "hsr_distance_per_game_m":  "HSR dist / game (m)",
-            "mean_peak_dynamic":        "Avg speed in run (km/h)",
-            "mean_pct_of_vmax_pct":     "Avg % of v-max",
-            "tournament_peak_speed_kmh":"Peak speed (km/h)",
-        }),
-        use_container_width=True,
-        height=400,
-    )
 
 
     # ══ Per-player zone heatmap ══════════════════════════════════════════
@@ -888,6 +843,53 @@ with tab1:
                     )
     else:
         st.info("Player zone heatmap requires start_x/start_y columns in hsr_runs.csv.")
+
+
+    st.divider()
+    st.markdown("#### Full player table")
+
+    # Build display table — add avg speed, cap pct_of_vmax at 100%
+    display_cols = [
+        "player_name", "team_name", "pos", "pos_detail", "games_appeared",
+        "vmax_kmh", "threshold_at_pct", "total_runs_dynamic", "runs_per_game_dynamic",
+        "hsr_distance_per_game_m", "mean_peak_dynamic", "mean_pct_of_vmax_pct",
+        "tournament_peak_speed_kmh",
+    ]
+    table_df = filtered_summary[display_cols].copy()
+
+    # Cap avg % of v-max at 100 — values above 100 occur when peak speed
+    # in a run slightly exceeds the p99.5 v-max estimate (expected, not an error)
+    table_df["mean_pct_of_vmax_pct"] = table_df["mean_pct_of_vmax_pct"].clip(upper=100.0)
+
+    # Round numeric columns
+    table_df["vmax_kmh"]           = table_df["vmax_kmh"].round(1)
+    table_df["threshold_at_pct"]   = table_df["threshold_at_pct"].round(1)
+    table_df["hsr_distance_per_game_m"] = table_df["hsr_distance_per_game_m"].round(0)
+    table_df["mean_peak_dynamic"]  = table_df["mean_peak_dynamic"].round(1)
+    table_df["tournament_peak_speed_kmh"] = table_df["tournament_peak_speed_kmh"].round(1)
+
+    st.dataframe(
+        table_df
+        .sort_values("runs_per_game_dynamic", ascending=False)
+        .reset_index(drop=True)
+        .rename(columns={
+            "player_name":              "Player",
+            "team_name":                "Team",
+            "pos":                      "Pos",
+            "pos_detail":               "Pos detail",
+            "games_appeared":           "Games",
+            "vmax_kmh":                 "v-max (km/h)",
+            "threshold_at_pct":         "Threshold (km/h)",
+            "total_runs_dynamic":       "Total runs",
+            "runs_per_game_dynamic":    "Runs / game",
+            "hsr_distance_per_game_m":  "HSR dist / game (m)",
+            "mean_peak_dynamic":        "Avg speed in run (km/h)",
+            "mean_pct_of_vmax_pct":     "Avg % of v-max",
+            "tournament_peak_speed_kmh":"Peak speed (km/h)",
+        }),
+        use_container_width=True,
+        height=400,
+    )
 
 # ══════════════════════════════════════════════
 # TAB 2 — Team analysis
