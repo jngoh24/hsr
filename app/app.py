@@ -191,13 +191,16 @@ def load_data():
     runs       = pd.read_csv(os.path.join(DATA_DIR, "hsr_runs.csv"))
     meta_path  = os.path.join(DATA_DIR, "match_metadata.csv")
     metadata   = pd.read_csv(meta_path) if os.path.exists(meta_path) else pd.DataFrame()
-    return summary, comparison, runs, metadata
+    abs_path   = os.path.join(DATA_DIR, "hsr_absolute_runs.csv")
+    absolute   = pd.read_csv(abs_path) if os.path.exists(abs_path) else pd.DataFrame()
+    return summary, comparison, runs, metadata, absolute
 
 try:
-    summary_df, comparison_df, runs_df, match_meta_df = load_data()
+    summary_df, comparison_df, runs_df, match_meta_df, absolute_df = load_data()
     data_loaded = True
 except FileNotFoundError:
     data_loaded = False
+    absolute_df = pd.DataFrame()
     match_meta_df = pd.DataFrame()
 
 # ─────────────────────────────────────────────
@@ -425,19 +428,24 @@ comparison_df["threshold_at_pct"]   = comparison_df["vmax_kmh"] * threshold_pct
 comparison_df["above_absolute"]     = comparison_df["threshold_at_pct"] <= 20.0
 comparison_df["new_threshold_vs_20"]= comparison_df["threshold_at_pct"] - 20.0
 
-# Dynamic comparison: recount absolute and relative runs at new threshold
-abs_counts = (
-    runs_df[runs_df["peak_speed_kmh"] >= 20.0]
-    .groupby("player_id")
-    .size()
-    .reset_index(name="runs_absolute_dynamic")
-)
+# Dynamic comparison: recount relative runs at new threshold
+# Absolute runs come from pre-computed hsr_absolute_runs.csv — correctly
+# derived from the full Silver table, not just from hsr_runs.csv
 rel_counts = (
     qualifying_runs
     .groupby("player_id")
     .size()
     .reset_index(name="runs_relative_dynamic")
 )
+
+# Use pre-computed absolute counts if available, else fall back to 0
+if not absolute_df.empty and "player_id" in absolute_df.columns:
+    abs_counts = absolute_df[["player_id", "runs_absolute"]].rename(
+        columns={"runs_absolute": "runs_absolute_dynamic"}
+    )
+else:
+    abs_counts = pd.DataFrame(columns=["player_id", "runs_absolute_dynamic"])
+
 comparison_df = comparison_df.merge(abs_counts, on="player_id", how="left")
 comparison_df = comparison_df.merge(rel_counts, on="player_id", how="left")
 comparison_df["runs_absolute_dynamic"] = comparison_df["runs_absolute_dynamic"].fillna(0).astype(int)
