@@ -469,7 +469,8 @@ filtered_summary = summary_merged[
 
 filtered_comparison = comparison_df[
     comparison_df["team_short"].isin(selected_teams) &
-    comparison_df["pos"].isin(selected_positions)
+    comparison_df["pos"].isin(selected_positions) &
+    (comparison_df["n_games"] >= min_games)
 ].copy()
 
 # ─────────────────────────────────────────────
@@ -477,8 +478,9 @@ filtered_comparison = comparison_df[
 # ─────────────────────────────────────────────
 k1, k2, k3, k4, k5 = st.columns(5)
 
-n_below_20 = (comparison_df["threshold_at_pct"] < 20.0).sum()
-pct_below  = n_below_20 / len(comparison_df) * 100
+# All KPI cards respect the same sidebar filters as the charts
+n_below_20 = (filtered_comparison["threshold_at_pct"] < 20.0).sum()
+pct_below  = n_below_20 / len(filtered_comparison) * 100 if len(filtered_comparison) > 0 else 0
 avg_vmax   = filtered_summary["vmax_kmh"].mean()
 avg_runs   = filtered_summary["runs_per_game_dynamic"].mean()
 top_speed  = filtered_summary["tournament_peak_speed_kmh"].max()
