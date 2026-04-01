@@ -480,17 +480,25 @@ filtered_comparison = comparison_df[
 # ─────────────────────────────────────────────
 # KPI cards
 # ─────────────────────────────────────────────
-k1, k2, k3, k4 = st.columns(4)
+k1, k2, k3, k4, k5 = st.columns(5)
 
 avg_vmax   = filtered_summary["vmax_kmh"].mean()
 avg_runs   = filtered_summary["runs_per_game_dynamic"].mean()
 top_speed  = filtered_summary["tournament_peak_speed_kmh"].max()
 n_players  = len(filtered_summary)
 
-k1.metric("Players tracked",       f"{n_players:,}")
-k2.metric("Avg v-max",             f"{avg_vmax:.1f} km/h")
-k3.metric("Avg HSR runs / game",   f"{avg_runs:.1f}")
-k4.metric("Top speed recorded",    f"{top_speed:.1f} km/h")
+# Players below 20 km/h — calculated from same filtered_summary as all other KPIs
+# filtered_summary already excludes low_confidence and applies min_games filter
+n_below_20 = (filtered_summary["threshold_at_pct"] < 20.0).sum()
+pct_below  = n_below_20 / n_players * 100 if n_players > 0 else 0
+
+k1.metric("Players tracked",              f"{n_players:,}")
+k2.metric("Avg v-max",                    f"{avg_vmax:.1f} km/h")
+k3.metric("Avg HSR runs / game",          f"{avg_runs:.1f}")
+k4.metric("Top speed recorded",           f"{top_speed:.1f} km/h")
+k5.metric("Players below 20 km/h threshold", f"{n_below_20} ({pct_below:.0f}%)",
+          help="Of the players tracked above, how many have a relative threshold "
+               "below 20 km/h — meaning the industry standard undercounts their effort")
 
 st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
