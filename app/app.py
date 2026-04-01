@@ -480,12 +480,8 @@ filtered_comparison = comparison_df[
 # ─────────────────────────────────────────────
 # KPI cards
 # ─────────────────────────────────────────────
-k1, k2, k3, k4, k5 = st.columns(5)
+k1, k2, k3, k4 = st.columns(4)
 
-# All KPI cards use filtered_summary as the single source of truth
-# so all five cards are always consistent with each other
-n_below_20 = (filtered_summary["threshold_at_pct"] < 20.0).sum()
-pct_below  = n_below_20 / len(filtered_summary) * 100 if len(filtered_summary) > 0 else 0
 avg_vmax   = filtered_summary["vmax_kmh"].mean()
 avg_runs   = filtered_summary["runs_per_game_dynamic"].mean()
 top_speed  = filtered_summary["tournament_peak_speed_kmh"].max()
@@ -495,9 +491,6 @@ k1.metric("Players tracked",       f"{n_players:,}")
 k2.metric("Avg v-max",             f"{avg_vmax:.1f} km/h")
 k3.metric("Avg HSR runs / game",   f"{avg_runs:.1f}")
 k4.metric("Top speed recorded",    f"{top_speed:.1f} km/h")
-k5.metric("Players below 20 km/h threshold", f"{n_below_20} ({pct_below:.0f}%)",
-          help="Players whose relative threshold sits below 20 km/h — "
-               "meaning the industry standard misses their high-effort runs")
 
 st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
