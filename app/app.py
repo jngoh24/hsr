@@ -21,29 +21,34 @@ st.set_page_config(
 # ─────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
+/* ── Global ── */
 html, body, [class*="css"] {
     font-family: 'Inter', system-ui, sans-serif;
-    color: #111111;
+    color: #1a1a1a;
 }
 
-.stApp { background-color: #ffffff; }
+.stApp {
+    background-color: #f7f7f5;
+}
 
-/* Sidebar */
+/* ── Sidebar ── */
 section[data-testid="stSidebar"] {
     background-color: #ffffff;
-    border-right: 1px solid #e5e7eb;
+    border-right: 1px solid #e5e5e3;
 }
-section[data-testid="stSidebar"] * { color: #111111 !important; }
+section[data-testid="stSidebar"] * {
+    color: #1a1a1a !important;
+}
 
-/* Headers */
+/* ── Headers ── */
 h1 {
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
-    font-size: 26px;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 600;
+    font-size: 28px;
     color: #111111;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
     line-height: 1.2;
 }
 h2, h3, h4 {
@@ -52,114 +57,125 @@ h2, h3, h4 {
     color: #111111;
     letter-spacing: -0.01em;
 }
-h3 { font-size: 15px; }
-h4 { font-size: 13px; font-weight: 500; color: #6b7280; }
+h3 { font-size: 16px; }
+h4 { font-size: 14px; font-weight: 500; color: #444; }
 
-/* Metric cards */
+/* ── Metric cards ── */
 [data-testid="metric-container"] {
     background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    padding: 14px 16px;
+    border: 1px solid #e5e5e3;
+    border-radius: 4px;
+    padding: 16px 20px;
+    box-shadow: none;
 }
 [data-testid="metric-container"] label {
-    font-size: 10px !important;
-    font-weight: 600 !important;
-    color: #9ca3af !important;
+    font-size: 11px;
+    font-weight: 500;
+    color: #888 !important;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
+    font-family: 'Inter', sans-serif;
 }
 [data-testid="metric-container"] [data-testid="stMetricValue"] {
-    font-size: 24px !important;
-    font-weight: 700 !important;
-    color: #111111 !important;
+    font-size: 26px;
+    font-weight: 600;
+    color: #111 !important;
+    font-family: 'Source Serif 4', serif;
 }
 
-/* Tabs — underline style */
+/* ── Tabs ── */
 .stTabs [data-baseweb="tab-list"] {
     background-color: transparent;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 2px solid #e5e5e3;
     gap: 0;
     padding-bottom: 0;
 }
 .stTabs [data-baseweb="tab"] {
     background-color: transparent;
-    color: #9ca3af;
+    color: #888;
     font-family: 'Inter', sans-serif;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     border-radius: 0;
     border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
+    margin-bottom: -2px;
     padding: 8px 16px;
 }
 .stTabs [aria-selected="true"] {
     background-color: transparent !important;
-    color: #111111 !important;
-    border-bottom: 2px solid #16a34a !important;
+    color: #111 !important;
+    border-bottom: 2px solid #111 !important;
 }
 
-/* Divider */
-hr { border-color: #f3f4f6; }
+/* ── Divider ── */
+hr { border-color: #e5e5e3; }
 
-/* Dataframe */
+/* ── Dataframe ── */
 [data-testid="stDataFrame"] {
-    border: 1px solid #e5e7eb;
+    border: 1px solid #e5e5e3;
     border-radius: 4px;
+    background: #fff;
 }
 
-/* Slider */
+/* ── Slider label ── */
 [data-testid="stSlider"] label {
-    font-size: 11px !important;
-    font-weight: 600 !important;
-    color: #6b7280 !important;
+    font-size: 12px;
+    font-weight: 500;
+    color: #444 !important;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
 }
 
-/* Multiselect labels */
+/* ── Multiselect ── */
 [data-testid="stMultiSelect"] label {
-    font-size: 11px !important;
-    font-weight: 600 !important;
-    color: #6b7280 !important;
+    font-size: 12px;
+    font-weight: 500;
+    color: #444 !important;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
 }
 
-/* Utility classes */
+/* ── Caption / label utility classes ── */
 .eyebrow {
     font-family: 'Inter', sans-serif;
     font-size: 11px;
     font-weight: 600;
-    color: #16a34a;
+    color: #888;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
+}
+.stat-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
 }
 .kicker {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Source Serif 4', serif;
     font-size: 13px;
-    color: #6b7280;
-    line-height: 1.6;
+    font-style: italic;
+    color: #555;
 }
 .threshold-badge {
     display: inline-block;
-    background: #111111;
-    color: #ffffff;
-    font-family: 'Inter', monospace;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 2px 8px;
+    background: #111;
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 3px 10px;
     border-radius: 3px;
+    letter-spacing: 0.02em;
 }
-.gained-badge { display:inline-block; background:#f0fdf4; color:#15803d;
+.gained-badge { display:inline-block; background:#e8f5e9; color:#2e7d32;
                 font-size:11px; font-weight:600; padding:2px 8px;
-                border-radius:3px; border:1px solid #bbf7d0; }
-.lost-badge   { display:inline-block; background:#fef2f2; color:#dc2626;
+                border-radius:3px; font-family:'Inter',sans-serif; }
+.lost-badge   { display:inline-block; background:#fce4e4; color:#c62828;
                 font-size:11px; font-weight:600; padding:2px 8px;
-                border-radius:3px; border:1px solid #fecaca; }
-.unch-badge   { display:inline-block; background:#f9fafb; color:#6b7280;
+                border-radius:3px; font-family:'Inter',sans-serif; }
+.unch-badge   { display:inline-block; background:#f5f5f5; color:#666;
                 font-size:11px; font-weight:600; padding:2px 8px;
-                border-radius:3px; border:1px solid #e5e7eb; }
+                border-radius:3px; font-family:'Inter',sans-serif; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -192,13 +208,12 @@ except FileNotFoundError:
 # ─────────────────────────────────────────────
 with st.sidebar:
     st.markdown(
-        '<p style="font-family:Inter;font-size:11px;font-weight:700;color:#16a34a;'
-        'text-transform:uppercase;letter-spacing:0.1em;margin:0 0 2px 0;">gradient</p>',
+        '<p class="eyebrow" style="margin-bottom:2px;">HSR Metric</p>',
         unsafe_allow_html=True
     )
     st.markdown(
-        '<p style="font-family:Inter;font-size:11px;color:#9ca3af;margin:0 0 16px 0;">'
-        'HSR Metric &middot; World Cup 2022</p>',
+        '<p style="font-family:Inter;font-size:12px;color:#666;margin:0 0 16px 0;">'
+        'FIFA World Cup 2022</p>',
         unsafe_allow_html=True
     )
     st.divider()
@@ -224,13 +239,12 @@ with st.sidebar:
     threshold_pct = threshold_int / 100.0
 
     st.markdown(f"""
-    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-left:3px solid #16a34a;
-                padding:10px 14px;margin-top:8px;border-radius:4px;">
-        <p style="font-family:Inter;font-size:10px;font-weight:600;color:#16a34a;
-                  text-transform:uppercase;letter-spacing:0.08em;margin:0 0 2px 0;">Active threshold</p>
-        <p style="font-family:Inter;font-size:28px;font-weight:700;
+    <div style="background:#f0f0ee;border-left:3px solid #111;padding:10px 14px;margin-top:8px;">
+        <p style="font-family:Inter;font-size:11px;font-weight:600;color:#888;
+                  text-transform:uppercase;letter-spacing:0.06em;margin:0 0 2px 0;">Active threshold</p>
+        <p style="font-family:'Source Serif 4',serif;font-size:28px;font-weight:600;
                   color:#111;margin:0;">{threshold_pct*100:.0f}%</p>
-        <p style="font-family:Inter;font-size:11px;color:#6b7280;margin:2px 0 0 0;">of personal v-max</p>
+        <p style="font-family:Inter;font-size:11px;color:#666;margin:2px 0 0 0;">of personal v-max</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -286,9 +300,10 @@ with st.sidebar:
 
     st.divider()
     st.markdown(
-        '<p style="font-family:Inter;font-size:11px;color:#6b7280;line-height:1.6;">'
-        '<strong style="color:#111;">New definition</strong> — &ge; threshold% of personal v-max for &ge; 1 second.<br><br>'
-        '<strong style="color:#111;">Industry standard</strong> — flat 20 km/h absolute threshold.</p>',
+        '<p style="font-family:Inter;font-size:11px;color:#888;line-height:1.5;">'
+        '<strong>New definition</strong> — a run where a player reaches &ge; threshold% '
+        'of their personal v-max for &ge; 1 second.<br><br>'
+        '<strong>Industry standard</strong> — flat 20 km/h absolute threshold.</p>',
         unsafe_allow_html=True
     )
 
@@ -491,20 +506,20 @@ st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 # Plotly theme
 # ─────────────────────────────────────────────
 PLOT_BG    = "#ffffff"
-PAPER_BG   = "#ffffff"
-GRID_COLOR = "#f3f4f6"
-TEXT_COLOR = "#6b7280"
-ACCENT     = "#16a34a"   # Gradient green
-BLUE       = "#1d4ed8"
-RED        = "#dc2626"
-AMBER      = "#f59e0b"
-GREEN      = "#16a34a"
+PAPER_BG   = "#f7f7f5"
+GRID_COLOR = "#eeeeec"
+TEXT_COLOR = "#666666"
+ACCENT     = "#1a6b3c"   # Athletic-style dark green
+BLUE       = "#1a4b8c"   # deep blue for second accent
+RED        = "#c0392b"   # muted red
+AMBER      = "#b7791f"   # warm amber
+GREEN      = "#1a6b3c"
 POS_COLORS = {
-    "GK":  "#dc2626",   # red
-    "DEF": "#1d4ed8",   # blue
-    "MID": "#16a34a",   # Gradient green
-    "FWD": "#f59e0b",   # amber
-    "UNK": "#9ca3af",
+    "GK":  "#f0a500",  # amber
+    "DEF": "#1a4b8c",  # blue
+    "MID": "#1a6b3c",  # green
+    "FWD": "#c0392b",  # red
+    "UNK": "#aaaaaa",
 }
 
 def base_layout(title="", height=400, xaxis=None, yaxis=None):
@@ -687,7 +702,7 @@ with tab1:
 
                 PITCH_BG_P = "#f8f8f5"
                 PITCH_LN_P = "#c8c8c4"
-                PL_TOP     = "#6ee7b7"
+                PL_TOP     = "#aaaaaa"
 
                 fig_ph = go.Figure()
 
@@ -710,9 +725,9 @@ with tab1:
                         pct   = float(zone_pct_30[row_i, col_i])
                         inten = count / max_c
 
-                        r_c = int(255 + (22  - 255) * inten)
-                        g_c = int(255 + (163 - 255) * inten)
-                        b_c = int(255 + (74  - 255) * inten)
+                        r_c = int(255 + (26  - 255) * inten)
+                        g_c = int(255 + (75  - 255) * inten)
+                        b_c = int(255 + (140 - 255) * inten)
                         fill = "rgba(%d,%d,%d,0.80)" % (r_c, g_c, b_c)
                         tcol = "#ffffff" if inten > 0.45 else "#222222"
                         cx   = (x0 + x1) / 2
@@ -801,7 +816,7 @@ with tab1:
                 )
 
                 fig_ph.update_layout(
-                    plot_bgcolor="#f0fdf4",
+                    plot_bgcolor=PITCH_BG_P,
                     paper_bgcolor=PAPER_BG,
                     height=460,
                     margin=dict(l=70, r=16, t=30, b=20),
@@ -968,7 +983,7 @@ with tab2:
             x=team_agg_sorted["avg_hsr_distance"],
             y=team_agg_sorted["team_short"],
             orientation="h",
-            marker=dict(color=ACCENT, opacity=0.85, line=dict(width=0)),
+            marker=dict(color=ACCENT, line=dict(width=0)),
             hovertemplate="<b>%{y}</b><br>Avg HSR dist/game: %{x:.0f}m<extra></extra>",
         ))
         fig_dist.update_layout(
@@ -1058,7 +1073,7 @@ with tab3:
         labels     = ["Runs/game", "v-max", "HSR dist", "Intensity", "Peak speed"]
 
         fig_radar = go.Figure()
-        colors    = [POS_COLORS.get(p, "#9ca3af") for p in ["GK","DEF","MID","FWD","UNK"]]
+        colors    = [POS_COLORS.get(p, "#888888") for p in ["GK","DEF","MID","FWD","UNK"]]
 
         for i, row in pos_agg.iterrows():
             vals = []
@@ -1390,8 +1405,8 @@ with tab5:
         # ── Build pitch figure ────────────────────────────────────────────
         fig_pitch = go.Figure()
 
-        PITCH_BG   = "#f0fdf4"
-        PITCH_LINE = "#a7f3d0"
+        PITCH_BG   = "#f8f8f5"
+        PITCH_LINE = "#c8c8c4"
         HEAT_LOW   = "#ffffff"
         HEAT_HIGH  = "#1a4b8c"
 
@@ -1416,9 +1431,9 @@ with tab5:
                 intensity = count / max_count
 
                 # Interpolate fill colour: white → dark blue
-                r = int(255 + (22  - 255) * intensity)
-                g = int(255 + (163 - 255) * intensity)
-                b = int(255 + (74  - 255) * intensity)
+                r = int(255 + (26  - 255) * intensity)
+                g = int(255 + (75  - 255) * intensity)
+                b = int(255 + (140 - 255) * intensity)
                 fill = f"rgba({r},{g},{b},0.75)"
                 text_col = "#ffffff" if intensity > 0.4 else "#333333"
 
@@ -1458,7 +1473,7 @@ with tab5:
                     )
 
         # Pitch markings on top of zones
-        PITCH_LINE_TOP = "#6ee7b7"
+        PITCH_LINE_TOP = "#aaaaaa"
         # Halfway line
         fig_pitch.add_shape(type="line", x0=0, x1=0, y0=-34, y1=34,
                             line=dict(color=PITCH_LINE_TOP, width=1.2))
@@ -1782,8 +1797,8 @@ with tab6:
                 max_count  = zone_counts.max() if zone_counts.max() > 0 else 1
 
                 fig_pm = go.Figure()
-                PITCH_BG   = "#f0fdf4"
-                PITCH_LINE = "#a7f3d0"
+                PITCH_BG   = "#f8f8f5"
+                PITCH_LINE = "#c8c8c4"
 
                 fig_pm.add_shape(
                     type="rect", x0=-52.5, x1=52.5, y0=-34, y1=34,
@@ -1797,9 +1812,9 @@ with tab6:
                         pct    = zone_pct_m[row_i, col_i]
                         speed  = zone_avg_speed[row_i, col_i]
                         inten  = count / max_count
-                        r = int(255 + (22  - 255) * inten)
-                        g = int(255 + (163 - 255) * inten)
-                        b = int(255 + (74  - 255) * inten)
+                        r = int(255 + (26  - 255) * inten)
+                        g = int(255 + (75  - 255) * inten)
+                        b = int(255 + (140 - 255) * inten)
                         fill = f"rgba({r},{g},{b},0.75)"
                         tcol = "#ffffff" if inten > 0.4 else "#333333"
                         cx, cy = (x0+x1)/2, (y0+y1)/2
@@ -1817,7 +1832,7 @@ with tab6:
                                                   font=dict(family="Inter", size=9, color=tcol if inten > 0.4 else "#666"),
                                                   xanchor="center", yanchor="middle")
 
-                PITCH_LINE_TOP = "#6ee7b7"
+                PITCH_LINE_TOP = "#aaaaaa"
                 for sh in [
                     dict(type="line", x0=0, x1=0, y0=-34, y1=34, line=dict(color=PITCH_LINE_TOP, width=1.2)),
                     dict(type="circle", x0=-9.15, x1=9.15, y0=-9.15, y1=9.15, line=dict(color=PITCH_LINE_TOP, width=1)),
@@ -1919,7 +1934,7 @@ with tab7:
                 round_agg["total_runs"] / round_agg["n_games"]
             ).round(1)
 
-            rnd_colors = {"Group Stage": ACCENT, "Knockout": "#111111"}
+            rnd_colors = {"Group Stage": BLUE, "Knockout": RED}
 
             # ── KPI row ───────────────────────────────────────────────────
             st.markdown("#### Summary metrics")
@@ -2103,16 +2118,10 @@ with tab7:
 # ─────────────────────────────────────────────
 # Footer
 # ─────────────────────────────────────────────
-st.markdown("<div style='height:32px'></div>", unsafe_allow_html=True)
+st.divider()
 st.markdown(
-    '<div style="background:#111111;margin:-1rem -1rem 0;padding:14px 24px;'
-    'display:flex;align-items:center;justify-content:space-between;">'
-    '<span style="font-family:Inter;font-size:12px;font-weight:700;color:#16a34a;'
-    'letter-spacing:-0.01em;">gradient<span style=\"color:#fff\">.</span></span>'
+    '<p style="text-align:center;font-family:Inter,sans-serif;font-size:13px;color:#888;">'
     '<a href="https://github.com/jngoh24/hsr-worldcup-2022" target="_blank" '
-    'style="font-family:Inter;font-size:11px;color:#6b7280;text-decoration:none;">'
-    'View on GitHub &rarr;</a>'
-    '<span style="font-family:Inter;font-size:11px;color:#374151;">'
-    'FIFA World Cup 2022 · Gradient Sports tracking data</span></div>',
+    'style="color:#888;text-decoration:underline;">View on GitHub</a></p>',
     unsafe_allow_html=True
 )
