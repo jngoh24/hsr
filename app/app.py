@@ -21,34 +21,45 @@ st.set_page_config(
 # ─────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* ── Global ── */
 html, body, [class*="css"] {
     font-family: 'Inter', system-ui, sans-serif;
-    color: #1a1a1a;
+    color: #111111;
 }
 
-.stApp {
-    background-color: #f7f7f5;
+.stApp { background-color: #ffffff; }
+
+/* Black topbar band — Gradient Sports style */
+header[data-testid="stHeader"] {
+    background-color: #111111 !important;
+    border-bottom: none !important;
+}
+header[data-testid="stHeader"] * { color: #ffffff !important; }
+
+/* Push main content below a simulated topbar */
+.block-container {
+    padding-top: 1.5rem !important;
+    border-top: 3px solid #111111;
 }
 
-/* ── Sidebar ── */
+/* Tabs sit right under the topbar — tighten gap */
+.stTabs { margin-top: 0; }
+
+/* Sidebar */
 section[data-testid="stSidebar"] {
     background-color: #ffffff;
-    border-right: 1px solid #e5e5e3;
+    border-right: 1px solid #e5e7eb;
 }
-section[data-testid="stSidebar"] * {
-    color: #1a1a1a !important;
-}
+section[data-testid="stSidebar"] * { color: #111111 !important; }
 
-/* ── Headers ── */
+/* Headers */
 h1 {
-    font-family: 'Source Serif 4', Georgia, serif;
-    font-weight: 600;
-    font-size: 28px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
     color: #111111;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
     line-height: 1.2;
 }
 h2, h3, h4 {
@@ -57,125 +68,149 @@ h2, h3, h4 {
     color: #111111;
     letter-spacing: -0.01em;
 }
-h3 { font-size: 16px; }
-h4 { font-size: 14px; font-weight: 500; color: #444; }
+h3 { font-size: 15px; }
+h4 { font-size: 13px; font-weight: 500; color: #6b7280; }
 
-/* ── Metric cards ── */
+/* Metric cards */
 [data-testid="metric-container"] {
     background-color: #ffffff;
-    border: 1px solid #e5e5e3;
-    border-radius: 4px;
-    padding: 16px 20px;
-    box-shadow: none;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 14px 16px;
 }
 [data-testid="metric-container"] label {
-    font-size: 11px;
-    font-weight: 500;
-    color: #888 !important;
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    color: #9ca3af !important;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px !important;
 }
 [data-testid="metric-container"] [data-testid="stMetricValue"] {
-    font-size: 26px;
-    font-weight: 600;
-    color: #111 !important;
-    font-family: 'Source Serif 4', serif;
+    font-size: 32px !important;
+    font-weight: 700 !important;
+    color: #111111 !important;
+    letter-spacing: -0.02em;
+    line-height: 1 !important;
 }
 
-/* ── Tabs ── */
+/* Tabs — underline style */
 .stTabs [data-baseweb="tab-list"] {
     background-color: transparent;
-    border-bottom: 2px solid #e5e5e3;
+    border-bottom: 1px solid #e5e7eb;
     gap: 0;
     padding-bottom: 0;
 }
 .stTabs [data-baseweb="tab"] {
     background-color: transparent;
-    color: #888;
+    color: #9ca3af;
     font-family: 'Inter', sans-serif;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     border-radius: 0;
     border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
+    margin-bottom: -1px;
     padding: 8px 16px;
 }
 .stTabs [aria-selected="true"] {
     background-color: transparent !important;
-    color: #111 !important;
-    border-bottom: 2px solid #111 !important;
+    color: #111111 !important;
+    border-bottom: 2px solid #16a34a !important;
 }
 
-/* ── Divider ── */
-hr { border-color: #e5e5e3; }
+/* Divider */
+hr { border-color: #f3f4f6; }
 
-/* ── Dataframe ── */
+/* Dataframe */
 [data-testid="stDataFrame"] {
-    border: 1px solid #e5e5e3;
+    border: 1px solid #e5e7eb;
     border-radius: 4px;
-    background: #fff;
 }
 
-/* ── Slider label ── */
+/* Slider */
 [data-testid="stSlider"] label {
-    font-size: 12px;
-    font-weight: 500;
-    color: #444 !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: #6b7280 !important;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
 }
 
-/* ── Multiselect ── */
+/* Multiselect labels */
 [data-testid="stMultiSelect"] label {
-    font-size: 12px;
-    font-weight: 500;
-    color: #444 !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: #6b7280 !important;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
 }
 
-/* ── Caption / label utility classes ── */
+/* Utility classes */
 .eyebrow {
     font-family: 'Inter', sans-serif;
     font-size: 11px;
     font-weight: 600;
-    color: #888;
+    color: #16a34a;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-}
-.stat-label {
-    font-family: 'Inter', sans-serif;
-    font-size: 11px;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.1em;
 }
 .kicker {
-    font-family: 'Source Serif 4', serif;
+    font-family: 'Inter', sans-serif;
     font-size: 13px;
-    font-style: italic;
-    color: #555;
+    color: #6b7280;
+    line-height: 1.6;
 }
 .threshold-badge {
     display: inline-block;
-    background: #111;
-    color: #fff;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    padding: 3px 10px;
+    background: #111111;
+    color: #ffffff;
+    font-family: 'Inter', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 8px;
     border-radius: 3px;
-    letter-spacing: 0.02em;
 }
-.gained-badge { display:inline-block; background:#e8f5e9; color:#2e7d32;
+.gained-badge { display:inline-block; background:#f0fdf4; color:#15803d;
                 font-size:11px; font-weight:600; padding:2px 8px;
-                border-radius:3px; font-family:'Inter',sans-serif; }
-.lost-badge   { display:inline-block; background:#fce4e4; color:#c62828;
+                border-radius:3px; border:1px solid #bbf7d0; }
+.lost-badge   { display:inline-block; background:#fef2f2; color:#dc2626;
                 font-size:11px; font-weight:600; padding:2px 8px;
-                border-radius:3px; font-family:'Inter',sans-serif; }
-.unch-badge   { display:inline-block; background:#f5f5f5; color:#666;
+                border-radius:3px; border:1px solid #fecaca; }
+.unch-badge   { display:inline-block; background:#f9fafb; color:#6b7280;
                 font-size:11px; font-weight:600; padding:2px 8px;
-                border-radius:3px; font-family:'Inter',sans-serif; }
+                border-radius:3px; border:1px solid #e5e7eb; }
+
+/* Gradient-style dataframe overrides */
+[data-testid="stDataFrame"] thead th {
+    background-color: #f9fafb !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    color: #9ca3af !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.07em !important;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+[data-testid="stDataFrame"] tbody tr:nth-child(even) {
+    background-color: #fafafa !important;
+}
+[data-testid="stDataFrame"] tbody td {
+    font-size: 12px !important;
+    color: #111111 !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+}
+
+/* Section headers above charts */
+.gs-section-header {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f3f4f6;
+    margin-bottom: 12px;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -208,12 +243,13 @@ except FileNotFoundError:
 # ─────────────────────────────────────────────
 with st.sidebar:
     st.markdown(
-        '<p class="eyebrow" style="margin-bottom:2px;">HSR Metric</p>',
+        '<p style="font-family:Inter;font-size:11px;font-weight:700;color:#16a34a;'
+        'text-transform:uppercase;letter-spacing:0.1em;margin:0 0 2px 0;">gradient</p>',
         unsafe_allow_html=True
     )
     st.markdown(
-        '<p style="font-family:Inter;font-size:12px;color:#666;margin:0 0 16px 0;">'
-        'FIFA World Cup 2022</p>',
+        '<p style="font-family:Inter;font-size:11px;color:#9ca3af;margin:0 0 16px 0;">'
+        'HSR Metric &middot; World Cup 2022</p>',
         unsafe_allow_html=True
     )
     st.divider()
@@ -239,12 +275,13 @@ with st.sidebar:
     threshold_pct = threshold_int / 100.0
 
     st.markdown(f"""
-    <div style="background:#f0f0ee;border-left:3px solid #111;padding:10px 14px;margin-top:8px;">
-        <p style="font-family:Inter;font-size:11px;font-weight:600;color:#888;
-                  text-transform:uppercase;letter-spacing:0.06em;margin:0 0 2px 0;">Active threshold</p>
-        <p style="font-family:'Source Serif 4',serif;font-size:28px;font-weight:600;
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-left:3px solid #16a34a;
+                padding:10px 14px;margin-top:8px;border-radius:4px;">
+        <p style="font-family:Inter;font-size:10px;font-weight:600;color:#16a34a;
+                  text-transform:uppercase;letter-spacing:0.08em;margin:0 0 2px 0;">Active threshold</p>
+        <p style="font-family:Inter;font-size:28px;font-weight:700;
                   color:#111;margin:0;">{threshold_pct*100:.0f}%</p>
-        <p style="font-family:Inter;font-size:11px;color:#666;margin:2px 0 0 0;">of personal v-max</p>
+        <p style="font-family:Inter;font-size:11px;color:#6b7280;margin:2px 0 0 0;">of personal v-max</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -300,10 +337,9 @@ with st.sidebar:
 
     st.divider()
     st.markdown(
-        '<p style="font-family:Inter;font-size:11px;color:#888;line-height:1.5;">'
-        '<strong>New definition</strong> — a run where a player reaches &ge; threshold% '
-        'of their personal v-max for &ge; 1 second.<br><br>'
-        '<strong>Industry standard</strong> — flat 20 km/h absolute threshold.</p>',
+        '<p style="font-family:Inter;font-size:11px;color:#6b7280;line-height:1.6;">'
+        '<strong style="color:#111;">New definition</strong> — &ge; threshold% of personal v-max for &ge; 1 second.<br><br>'
+        '<strong style="color:#111;">Industry standard</strong> — flat 20 km/h absolute threshold.</p>',
         unsafe_allow_html=True
     )
 
@@ -506,20 +542,20 @@ st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 # Plotly theme
 # ─────────────────────────────────────────────
 PLOT_BG    = "#ffffff"
-PAPER_BG   = "#f7f7f5"
-GRID_COLOR = "#eeeeec"
-TEXT_COLOR = "#666666"
-ACCENT     = "#1a6b3c"   # Athletic-style dark green
-BLUE       = "#1a4b8c"   # deep blue for second accent
-RED        = "#c0392b"   # muted red
-AMBER      = "#b7791f"   # warm amber
-GREEN      = "#1a6b3c"
+PAPER_BG   = "#ffffff"
+GRID_COLOR = "#f3f4f6"
+TEXT_COLOR = "#6b7280"
+ACCENT     = "#16a34a"   # Gradient green
+BLUE       = "#1d4ed8"
+RED        = "#dc2626"
+AMBER      = "#f59e0b"
+GREEN      = "#16a34a"
 POS_COLORS = {
-    "GK":  "#f0a500",  # amber
-    "DEF": "#1a4b8c",  # blue
-    "MID": "#1a6b3c",  # green
-    "FWD": "#c0392b",  # red
-    "UNK": "#aaaaaa",
+    "GK":  "#dc2626",   # red
+    "DEF": "#1d4ed8",   # blue
+    "MID": "#16a34a",   # Gradient green
+    "FWD": "#f59e0b",   # amber
+    "UNK": "#9ca3af",
 }
 
 def base_layout(title="", height=400, xaxis=None, yaxis=None):
@@ -554,7 +590,7 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
 # TAB 1 — Player ranking
 # ══════════════════════════════════════════════
 with tab1:
-    st.markdown("### Top players by HSR runs per game")
+    st.markdown('<p style="font-family:Inter;font-size:18px;font-weight:700;color:#111;letter-spacing:-0.02em;margin:0 0 4px 0;">Top players by HSR runs / game</p>', unsafe_allow_html=True)
     st.markdown(
         f'<p class="caption">Relative definition · threshold = {threshold_pct*100:.0f}% of personal v-max · min {min_games} games</p>',
         unsafe_allow_html=True
@@ -568,16 +604,29 @@ with tab1:
         top_players = filtered_summary.nlargest(top_n, "runs_per_game_dynamic")
 
         fig_bar = go.Figure()
-        pos_color_map = top_players["pos"].map(POS_COLORS).fillna("#aaa")
+        pos_color_map = top_players["pos"].map(POS_COLORS).fillna("#9ca3af")
+
+        # Rank label — bold number left of each bar
+        rank_labels = [
+            f"<b style='color:#111;font-size:12px'>{i+1}</b>  {name} <span style='color:#9ca3af'>({team})</span>"
+            for i, (name, team) in enumerate(
+                zip(top_players["player_name"], top_players["team_short"])
+            )
+        ]
+
         fig_bar.add_trace(go.Bar(
             x=top_players["runs_per_game_dynamic"],
-            y=top_players["player_name"] + " (" + top_players["team_short"] + ")",
+            y=[f"{i+1}. {n} ({t})" for i, (n, t) in enumerate(
+                zip(top_players["player_name"], top_players["team_short"]))],
             orientation="h",
             marker=dict(
                 color=pos_color_map,
                 line=dict(width=0),
-                opacity=0.85,
+                opacity=0.9,
             ),
+            text=top_players["runs_per_game_dynamic"].round(1),
+            textposition="outside",
+            textfont=dict(size=10, color="#111111", family="Inter"),
             hovertemplate=(
                 "<b>%{y}</b><br>"
                 "Runs/game: %{x:.1f}<br>"
@@ -586,10 +635,17 @@ with tab1:
         ))
         fig_bar.update_layout(
             **base_layout(
-                height=max(400, top_n * 22),
-                yaxis=dict(autorange="reversed", tickfont=dict(size=10)),
-                xaxis=dict(title="HSR runs per game"),
+                height=max(420, top_n * 26),
+                yaxis=dict(
+                    autorange="reversed",
+                    tickfont=dict(size=11, color="#111111", family="Inter"),
+                    tickprefix="  ",
+                ),
+                xaxis=dict(title="HSR runs per game", showticklabels=True),
             )
+        )
+        fig_bar.update_layout(
+            margin=dict(l=10, r=60, t=40, b=40),
         )
         st.plotly_chart(fig_bar, use_container_width=True)
 
@@ -624,7 +680,7 @@ with tab1:
 
 
     # ══ Per-player zone heatmap ══════════════════════════════════════════
-    st.markdown("#### Player zone heatmap")
+    st.markdown('<div class="gs-section-header">Player zone heatmap</div>', unsafe_allow_html=True)
     st.markdown(
         '<p style="font-family:Inter;font-size:12px;color:#666;">'
         'Select a player to see where their high-speed runs start across 30 pitch zones '
@@ -702,7 +758,7 @@ with tab1:
 
                 PITCH_BG_P = "#f8f8f5"
                 PITCH_LN_P = "#c8c8c4"
-                PL_TOP     = "#aaaaaa"
+                PL_TOP     = "#6ee7b7"
 
                 fig_ph = go.Figure()
 
@@ -725,9 +781,9 @@ with tab1:
                         pct   = float(zone_pct_30[row_i, col_i])
                         inten = count / max_c
 
-                        r_c = int(255 + (26  - 255) * inten)
-                        g_c = int(255 + (75  - 255) * inten)
-                        b_c = int(255 + (140 - 255) * inten)
+                        r_c = int(255 + (22  - 255) * inten)
+                        g_c = int(255 + (163 - 255) * inten)
+                        b_c = int(255 + (74  - 255) * inten)
                         fill = "rgba(%d,%d,%d,0.80)" % (r_c, g_c, b_c)
                         tcol = "#ffffff" if inten > 0.45 else "#222222"
                         cx   = (x0 + x1) / 2
@@ -816,7 +872,7 @@ with tab1:
                 )
 
                 fig_ph.update_layout(
-                    plot_bgcolor=PITCH_BG_P,
+                    plot_bgcolor="#f0fdf4",
                     paper_bgcolor=PAPER_BG,
                     height=460,
                     margin=dict(l=70, r=16, t=30, b=20),
@@ -862,7 +918,7 @@ with tab1:
 
 
     st.divider()
-    st.markdown("#### Full player table")
+    st.markdown('<div class="gs-section-header">Full player table</div>', unsafe_allow_html=True)
 
     # Build display table — add avg speed, cap pct_of_vmax at 100%
     display_cols = [
@@ -911,7 +967,7 @@ with tab1:
 # TAB 2 — Team analysis
 # ══════════════════════════════════════════════
 with tab2:
-    st.markdown("### Team HSR profile")
+    st.markdown('<p style="font-family:Inter;font-size:18px;font-weight:700;color:#111;letter-spacing:-0.02em;margin:0 0 4px 0;">Team HSR profile</p>', unsafe_allow_html=True)
 
     team_agg = (
         filtered_summary
@@ -983,7 +1039,7 @@ with tab2:
             x=team_agg_sorted["avg_hsr_distance"],
             y=team_agg_sorted["team_short"],
             orientation="h",
-            marker=dict(color=ACCENT, line=dict(width=0)),
+            marker=dict(color=ACCENT, opacity=0.85, line=dict(width=0)),
             hovertemplate="<b>%{y}</b><br>Avg HSR dist/game: %{x:.0f}m<extra></extra>",
         ))
         fig_dist.update_layout(
@@ -997,7 +1053,7 @@ with tab2:
         st.plotly_chart(fig_dist, use_container_width=True)
 
     st.divider()
-    st.markdown("#### Team summary table")
+    st.markdown('<div class="gs-section-header">Team summary table</div>', unsafe_allow_html=True)
     st.dataframe(
         team_agg
         .sort_values("avg_runs_per_game", ascending=False)
@@ -1022,7 +1078,7 @@ with tab2:
 # TAB 3 — Position analysis
 # ══════════════════════════════════════════════
 with tab3:
-    st.markdown("### HSR by position")
+    st.markdown('<p style="font-family:Inter;font-size:18px;font-weight:700;color:#111;letter-spacing:-0.02em;margin:0 0 4px 0;">HSR by position</p>', unsafe_allow_html=True)
 
     pos_agg = (
         filtered_summary
@@ -1073,7 +1129,7 @@ with tab3:
         labels     = ["Runs/game", "v-max", "HSR dist", "Intensity", "Peak speed"]
 
         fig_radar = go.Figure()
-        colors    = [POS_COLORS.get(p, "#888888") for p in ["GK","DEF","MID","FWD","UNK"]]
+        colors    = [POS_COLORS.get(p, "#9ca3af") for p in ["GK","DEF","MID","FWD","UNK"]]
 
         for i, row in pos_agg.iterrows():
             vals = []
@@ -1108,7 +1164,7 @@ with tab3:
         st.plotly_chart(fig_radar, use_container_width=True)
 
     # Position table
-    st.markdown("#### Position summary table")
+    st.markdown('<div class="gs-section-header">Position summary table</div>', unsafe_allow_html=True)
     st.dataframe(
         pos_agg.rename(columns={
             "position": "Pos group",
@@ -1127,7 +1183,7 @@ with tab3:
 # TAB 4 — Definition comparison
 # ══════════════════════════════════════════════
 with tab4:
-    st.markdown("### Relative vs industry standard (20 km/h flat)")
+    st.markdown('<p style="font-family:Inter;font-size:18px;font-weight:700;color:#111;letter-spacing:-0.02em;margin:0 0 4px 0;">Relative vs industry standard</p>', unsafe_allow_html=True)
     st.markdown(
         f'<p class="caption">Comparing {threshold_pct*100:.0f}% of personal v-max '
         f'vs flat 20 km/h threshold across all players</p>',
@@ -1190,7 +1246,7 @@ with tab4:
         st.plotly_chart(fig_thresh, use_container_width=True)
 
     # Team outperformance
-    st.markdown("#### Team outperformance vs industry standard")
+    st.markdown('<div class="gs-section-header">Team outperformance vs industry standard</div>', unsafe_allow_html=True)
     team_comp = (
         filtered_comparison
         .groupby(["team_name", "team_short"])
@@ -1237,7 +1293,7 @@ with tab4:
     st.plotly_chart(fig_outperf, use_container_width=True)
 
     # Most affected players
-    st.markdown("#### Most affected players")
+    st.markdown('<div class="gs-section-header">Most affected players</div>', unsafe_allow_html=True)
     most_affected = (
         filtered_comparison
         .reindex(columns=["player_name", "team_short", "pos", "pos_detail",
@@ -1405,8 +1461,8 @@ with tab5:
         # ── Build pitch figure ────────────────────────────────────────────
         fig_pitch = go.Figure()
 
-        PITCH_BG   = "#f8f8f5"
-        PITCH_LINE = "#c8c8c4"
+        PITCH_BG   = "#f0fdf4"
+        PITCH_LINE = "#a7f3d0"
         HEAT_LOW   = "#ffffff"
         HEAT_HIGH  = "#1a4b8c"
 
@@ -1431,9 +1487,9 @@ with tab5:
                 intensity = count / max_count
 
                 # Interpolate fill colour: white → dark blue
-                r = int(255 + (26  - 255) * intensity)
-                g = int(255 + (75  - 255) * intensity)
-                b = int(255 + (140 - 255) * intensity)
+                r = int(255 + (22  - 255) * intensity)
+                g = int(255 + (163 - 255) * intensity)
+                b = int(255 + (74  - 255) * intensity)
                 fill = f"rgba({r},{g},{b},0.75)"
                 text_col = "#ffffff" if intensity > 0.4 else "#333333"
 
@@ -1473,7 +1529,7 @@ with tab5:
                     )
 
         # Pitch markings on top of zones
-        PITCH_LINE_TOP = "#aaaaaa"
+        PITCH_LINE_TOP = "#6ee7b7"
         # Halfway line
         fig_pitch.add_shape(type="line", x0=0, x1=0, y0=-34, y1=34,
                             line=dict(color=PITCH_LINE_TOP, width=1.2))
@@ -1797,8 +1853,8 @@ with tab6:
                 max_count  = zone_counts.max() if zone_counts.max() > 0 else 1
 
                 fig_pm = go.Figure()
-                PITCH_BG   = "#f8f8f5"
-                PITCH_LINE = "#c8c8c4"
+                PITCH_BG   = "#f0fdf4"
+                PITCH_LINE = "#a7f3d0"
 
                 fig_pm.add_shape(
                     type="rect", x0=-52.5, x1=52.5, y0=-34, y1=34,
@@ -1812,9 +1868,9 @@ with tab6:
                         pct    = zone_pct_m[row_i, col_i]
                         speed  = zone_avg_speed[row_i, col_i]
                         inten  = count / max_count
-                        r = int(255 + (26  - 255) * inten)
-                        g = int(255 + (75  - 255) * inten)
-                        b = int(255 + (140 - 255) * inten)
+                        r = int(255 + (22  - 255) * inten)
+                        g = int(255 + (163 - 255) * inten)
+                        b = int(255 + (74  - 255) * inten)
                         fill = f"rgba({r},{g},{b},0.75)"
                         tcol = "#ffffff" if inten > 0.4 else "#333333"
                         cx, cy = (x0+x1)/2, (y0+y1)/2
@@ -1832,7 +1888,7 @@ with tab6:
                                                   font=dict(family="Inter", size=9, color=tcol if inten > 0.4 else "#666"),
                                                   xanchor="center", yanchor="middle")
 
-                PITCH_LINE_TOP = "#aaaaaa"
+                PITCH_LINE_TOP = "#6ee7b7"
                 for sh in [
                     dict(type="line", x0=0, x1=0, y0=-34, y1=34, line=dict(color=PITCH_LINE_TOP, width=1.2)),
                     dict(type="circle", x0=-9.15, x1=9.15, y0=-9.15, y1=9.15, line=dict(color=PITCH_LINE_TOP, width=1)),
@@ -1934,7 +1990,7 @@ with tab7:
                 round_agg["total_runs"] / round_agg["n_games"]
             ).round(1)
 
-            rnd_colors = {"Group Stage": BLUE, "Knockout": RED}
+            rnd_colors = {"Group Stage": ACCENT, "Knockout": "#111111"}
 
             # ── KPI row ───────────────────────────────────────────────────
             st.markdown("#### Summary metrics")
@@ -2097,7 +2153,7 @@ with tab7:
             st.divider()
 
             # ── Summary table ─────────────────────────────────────────────
-            st.markdown("#### Summary table")
+            st.markdown('<div class="gs-section-header">Summary table</div>', unsafe_allow_html=True)
             st.dataframe(
                 round_agg
                 .rename(columns={
@@ -2118,10 +2174,16 @@ with tab7:
 # ─────────────────────────────────────────────
 # Footer
 # ─────────────────────────────────────────────
-st.divider()
+st.markdown("<div style='height:32px'></div>", unsafe_allow_html=True)
 st.markdown(
-    '<p style="text-align:center;font-family:Inter,sans-serif;font-size:13px;color:#888;">'
+    '<div style="background:#111111;margin:-1rem -1rem 0;padding:14px 24px;'
+    'display:flex;align-items:center;justify-content:space-between;">'
+    '<span style="font-family:Inter;font-size:12px;font-weight:700;color:#16a34a;'
+    'letter-spacing:-0.01em;">gradient<span style=\"color:#fff\">.</span></span>'
     '<a href="https://github.com/jngoh24/hsr-worldcup-2022" target="_blank" '
-    'style="color:#888;text-decoration:underline;">View on GitHub</a></p>',
+    'style="font-family:Inter;font-size:11px;color:#6b7280;text-decoration:none;">'
+    'View on GitHub &rarr;</a>'
+    '<span style="font-family:Inter;font-size:11px;color:#374151;">'
+    'FIFA World Cup 2022 · Gradient Sports tracking data</span></div>',
     unsafe_allow_html=True
 )
